@@ -1,9 +1,6 @@
 # main.py
 from asyncio import wait
-import json
-import shutil
 import time
-from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -17,12 +14,11 @@ from module.getListPeriod import getListPeriod
 from module.getProvince import getListProvincePeriod
 
 # Replace 'path/to/geckodriver' with the actual path to your GeckoDriver executable
-gecko_path = './geckodriver'
+executable_path = './geckodriver'
 
-# Set GeckoDriver executable path using executable_path argument in options
+# Set GeckoDriver executable path using executable_path parameter in options
 options = webdriver.FirefoxOptions()
-options.binary_location = '/Applications/Firefox.app/Contents/MacOS/firefox-bin'  # Update with your Firefox binary location
-options.add_argument(f"marionette;executable_path={gecko_path}")
+options.add_argument(f"marionette;executable_path={executable_path}")
 
 # Open Firefox WebDriver with specified options
 driver = webdriver.Firefox(options=options)
@@ -107,14 +103,19 @@ for i in range(len_menu):
                     button = wait.until(EC.element_to_be_clickable((By.ID, 'CFSReportViewer_ctl05_ctl04_ctl00_ButtonImgDown')))
                     button.click()
                     
-                    button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.='PDF']")))
+                    button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.='Excel']")))
                     button.click()
                     time.sleep(10)
                     # convert_iframe_to_pdf(driver.page_source, "./output.pdf")
                 except Exception as e:
                     print(f"An error occurred: {e}")
                 finally:
-                    driver.switch_to.window(driver.window_handles[0])
+                    handles = driver.window_handles
+                    for handle in handles[1:]:
+                        driver.switch_to.window(handle)
+                        driver.close()
+                    # Switch back to the original tab
+                    driver.switch_to.window(handles[0])
     
 # provincePeriod = getListProvincePeriod(driver)
 # kotaPeriod = getKota(driver)
