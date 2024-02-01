@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 def getListPeriod(driver):
-    period = 0
+    period = []
     try:
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'Month-triggerWrap'))
@@ -16,12 +16,14 @@ def getListPeriod(driver):
                 EC.element_to_be_clickable((By.ID,"ext-gen1050"))
             )
             button.click()
-            page_source = driver.page_source
-            soup = BeautifulSoup(page_source, 'html.parser')
-            div_element = soup.find('div', class_='x-boundlist')
-            li_elements = div_element.find_all('li')
-            li_count = len(li_elements)
-            period = li_count
+            # soup = BeautifulSoup(page_source, 'html.parser')
+            # div_element = soup.find('div', class_='x-boundlist')
+
+            boundlist = driver.find_element(By.CLASS_NAME, "x-boundlist-list-ct")
+            list_items = boundlist.find_elements(By.CLASS_NAME, "x-boundlist-item")
+            # Extract and print the text content of each <li> element
+            for item in list_items:
+                period.append(item.text)
             
         finally:
             return period
