@@ -5,13 +5,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from module.convert_iframe_to_pdf import convert_iframe_to_pdf
 from module.getBank import getBank
 from module.getKota import getKota
+from selenium.webdriver.common.keys import Keys
 
 from module.getListOption import getListMenu
 from module.getListPeriod import getListPeriod
 from module.getProvince import getListProvincePeriod
+from module.renameFile import copy_and_rename_xlsx
 
 # Replace 'path/to/geckodriver' with the actual path to your GeckoDriver executable
 executable_path = './geckodriver'
@@ -28,9 +29,17 @@ driver.get('https://cfs.ojk.go.id/cfs/Report.aspx?BankTypeCode=BPK&BankTypeName=
 periods = getListPeriod(driver)
 len_menu = getListMenu(driver)
 provincePeriod = getListProvincePeriod(driver)
+
 for i in range(len_menu):
     # Wait for the checkbox element to be clickable
     driver.get('https://cfs.ojk.go.id/cfs/Report.aspx?BankTypeCode=BPK&BankTypeName=BPR%20Konvensional')
+    input_element = driver.find_element("id", "Year-inputEl")
+    # Clear the existing value in the input field (optional)
+    input_element.clear()
+    # Type the new value into the input field
+    input_element.send_keys("2023")  # Change this to the desired value
+    # Optionally, simulate pressing the Enter key (if needed)
+    input_element.send_keys(Keys.RETURN)
     button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.ID,"ext-gen1050"))
             )
@@ -116,6 +125,10 @@ for i in range(len_menu):
                         driver.close()
                     # Switch back to the original tab
                     driver.switch_to.window(handles[0])
+                    source_file = '/Users/rohmatdasuki/Downloads/CFS1LevelGroupingWithOutNumber_2020.xlsx'
+                    destination_folder = './file'
+                    new_filename = f"{bank}.xlxs"
+                    copy_and_rename_xlsx(source_file, destination_folder, new_filename)
     
 # provincePeriod = getListProvincePeriod(driver)
 # kotaPeriod = getKota(driver)
