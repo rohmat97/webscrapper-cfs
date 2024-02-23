@@ -26,7 +26,7 @@ driver = webdriver.Firefox(options=options)
 # Open the webpage
 driver.get('https://cfs.ojk.go.id/cfs/Report.aspx?BankTypeCode=BPK&BankTypeName=BPR%20Konvensional')
 
-period_year = ["2023","2024"]
+period_year = ["2024"]
 periods_month = getListPeriod(driver)
 len_menu = getListMenu(driver)
 provincePeriod = getListProvincePeriod(driver)
@@ -102,42 +102,41 @@ for iy in period_year:
                                     EC.element_to_be_clickable((By.ID, 'ShowReportButton-btnWrap'))
                                 )
                         button.click()
-
-                        iframe_id = 'BPK-901-00000'+ str(i+1)
-                        driver.switch_to.frame(iframe_id)
-                        
-                        # try to download
-                        time.sleep(5)
                         try:
-                            driver.find_element(By.XPATH, '//table[@id="CFSReportViewer_ctl05_ctl04_ctl00_Button"]//img[1]')
-                            WebDriverWait(driver, 10).until(
-                                EC.element_to_be_clickable((By.XPATH, '//table[@id="CFSReportViewer_ctl05_ctl04_ctl00_Button"]//img[1]'))
-                            ).click()
-                            wait = WebDriverWait(driver, 20)  # Adjust the timeout as needed
+                            iframe_id = 'BPK-901-00000'+ str(i+1)
+                            driver.switch_to.frame(iframe_id)
+                            # try to download
+                            time.sleep(5)
+                            try:
+                                driver.find_element(By.XPATH, '//table[@id="CFSReportViewer_ctl05_ctl04_ctl00_Button"]//img[1]')
+                                WebDriverWait(driver, 10).until(
+                                    EC.element_to_be_clickable((By.XPATH, '//table[@id="CFSReportViewer_ctl05_ctl04_ctl00_Button"]//img[1]'))
+                                ).click()
+                                wait = WebDriverWait(driver, 20)  # Adjust the timeout as needed
 
-                            button = wait.until(EC.element_to_be_clickable((By.ID, 'CFSReportViewer_ctl05_ctl04_ctl00_ButtonImgDown')))
-                            button.click()
-                            
-                            button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.='Excel']")))
-                            button.click()
-                            time.sleep(10)
-                            # convert_iframe_to_pdf(driver.page_source, "./output.pdf")
-                        except Exception as e:
-                            print(f"An error occurred: {e}")
-                        finally:
-                            handles = driver.window_handles
-                            for handle in handles[1:]:
-                                driver.switch_to.window(handle)
-                                driver.close()
-                            # Switch back to the original tab
-                            driver.switch_to.window(handles[0])
-                            source_file = '/Users/rohmatdasuki/Downloads/CFS1LevelGroupingWithOutNumber_2020.xlsx'
-                            destination_folder = './file'
-                            new_filename = f"{bank}.xlxs"
-                            copy_and_rename_xlsx(source_file, destination_folder, new_filename)
-        
-    
-    
+                                button = wait.until(EC.element_to_be_clickable((By.ID, 'CFSReportViewer_ctl05_ctl04_ctl00_ButtonImgDown')))
+                                button.click()
+                                
+                                button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[.='Excel']")))
+                                button.click()
+                                time.sleep(10)
+                                # convert_iframe_to_pdf(driver.page_source, "./output.pdf")
+                            except Exception as e:
+                                print(f"An error occurred: {e}")
+                            finally:
+                                handles = driver.window_handles
+                                for handle in handles[1:]:
+                                    driver.switch_to.window(handle)
+                                    driver.close()
+                                # Switch back to the original tab
+                                driver.switch_to.window(handles[0])
+                                source_file = '/Users/rohmatdasuki/Downloads/CFS1LevelGroupingWithOutNumber_2020.xlsx'
+                                destination_folder = './file'
+                                new_filename = f"{bank}.xlxs"
+                                copy_and_rename_xlsx(source_file, destination_folder, new_filename)
+                        except:
+                            # Handle the case when the iframe is not found
+                            print(f"Could not find iframe with ID: {iframe_id}")
 time.sleep(2)
 driver.quit()
 # WebDriverWait(driver, 10).until(
