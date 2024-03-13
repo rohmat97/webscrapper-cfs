@@ -138,7 +138,18 @@ for iy in period_year:
                             
                             for index, row in enumerate(selected_rows, 1):
                                 if index in (28, 50):
-                                    print(f"{index}. {row}")
+                                    # print(f"{index}. {row}")
+                                    if index == 28:
+                                        # Find the span element with the specified class
+                                        span_element = row.find('span', class_='A035263adf76445558c7cad71aae10adf15')
+
+                                        # Extract the value
+                                        if span_element:
+                                            value = span_element.text.strip()
+                                            print(f"Value: {value}")
+                                        else:
+                                            print("Value not found in the HTML.")
+                                        
                                     with open(f'./html/table{index}.html', 'w', encoding='utf-8') as file:
                                         file.write(str(row))
                                     HTML(string=str(row)).write_pdf(f'./pdf/output{index}.pdf', margin_top='10mm', margin_bottom='10mm', margin_left='10mm', margin_right='10mm')
